@@ -104,17 +104,14 @@ class CloseApproach:
 
         :param info: A dictionary of excess keyword arguments supplied to the constructor.
         """
-        # TODO: Assign information from the arguments passed to the constructor
-        # onto attributes named `_designation`, `time`, `distance`, and `velocity`.
-        # You should coerce these values to their appropriate data type and handle any edge cases.
-        # The `cd_to_datetime` function will be useful.
-        self._designation = ''
-        self.time = None  # TODO: Use the cd_to_datetime function for this attribute.
-        self.distance = 0.0
-        self.velocity = 0.0
-
-        # Create an attribute for the referenced NEO, originally None.
-        self.neo = None
+        self._designation = info.get('des', None)
+        if (info.get('cd', None) is None):
+            self.time = None
+        else:
+            self.time = cd_to_datetime(info.get('cd'))  # TODO: Use the cd_to_datetime function for this attribute.
+        self.distance = info.get('dict', float('nan'))
+        self.velocity = info.get('v_rev', float('nan'))
+        self.neo = info.get("neo", None)
 
     @property
     def time_str(self):
@@ -129,17 +126,21 @@ class CloseApproach:
         formatted string that can be used in human-readable representations and
         in serialization to CSV and JSON files.
         """
-        # TODO: Use this object's `.time` attribute and the `datetime_to_str` function to
-        # build a formatted representation of the approach time.
-        # TODO: Use self.designation and self.name to build a fullname for this object.
-        return ''
+        return datetime_to_str(self.time)
 
+    @property
+    def fullname(self):
+        """ Returns the fullname of the NEOS object the class of CloseApproach pointing
+            towards
+        """
+        return self.neo.fullname
+    
+    
+    
     def __str__(self):
         """Return `str(self)`."""
-        # TODO: Use this object's attributes to return a human-readable string representation.
-        # The project instructions include one possibility. Peek at the __repr__
-        # method for examples of advanced string formatting.
-        return f"A CloseApproach ..."
+        return f"On " + self.time_str + ", " + "'" + self.fullname +f"' approaches Earth " \
+                  f"at a distance of {self.distance:.2f} au and a velocity of {self.velocity:.2f} km/s."
 
     def __repr__(self):
         """Return `repr(self)`, a computer-readable string representation of this object."""
