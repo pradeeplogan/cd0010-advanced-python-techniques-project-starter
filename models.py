@@ -17,6 +17,7 @@ quirks of the data set, such as missing names and unknown diameters.
 
 You'll edit this file in Task 1.
 """
+from cmath import nan
 from math import isnan
 from helpers import cd_to_datetime, datetime_to_str
 
@@ -49,13 +50,13 @@ class NearEarthObject:
     @property
     def fullname(self):
         """Return a representation of the full name of this NEO."""
-        if self.name == None:
+        if self.name is None:
             return self.designation
         return f'{self.designation} ({self.name})'
 
     @property
     def _diameter_to_str(self):
-        """Return a string 'unknow' or 'diameter of {value}' 
+        """Return a string 'unknow' or 'diameter of {value}'
             depending if neos has known diameter
         """
         if isnan(self.diameter):
@@ -74,7 +75,7 @@ class NearEarthObject:
 
     def __str__(self):
         """Return `str(self)`."""
-        if self.designation: 
+        if self.designation:
             return f"A NearEarthObject " + self.fullname + f" has a " + self._diameter_to_str + " and "+ self._hazardous_to_str +" potentially hazardous."
         return 'No matching NEOs exist in the database.'
 
@@ -83,6 +84,16 @@ class NearEarthObject:
         return f"NearEarthObject(designation={self.designation!r}, name={self.name!r}, " \
                f"diameter={self.diameter:.3f}, hazardous={self.hazardous!r})"
 
+    def serialize(self):
+        """ Return a serialize dictionary for output printing"""
+        serialize_dict = {}
+
+        serialize_dict['designation'] = self.designation
+        serialize_dict['name'] = self.name
+        serialize_dict['diameter_km'] = self.diameter
+        serialize_dict['potentially_hazardous'] = self.hazardous
+
+        return serialize_dict
 
 class CloseApproach:
     """A close approach to Earth by an NEO.
@@ -97,7 +108,6 @@ class CloseApproach:
     private attribute, but the referenced NEO is eventually replaced in the
     `NEODatabase` constructor.
     """
-    # TODO: How can you, and should you, change the arguments to this constructor?
     # If you make changes, be sure to update the comments in this file.
     def __init__(self, **info):
         """Create a new `CloseApproach`.
@@ -134,9 +144,7 @@ class CloseApproach:
             towards
         """
         return self.neo.fullname
-    
-    
-    
+
     def __str__(self):
         """Return `str(self)`."""
         return f"On " + self.time_str + ", " + "'" + self.fullname +f"' approaches Earth " \
@@ -146,3 +154,15 @@ class CloseApproach:
         """Return `repr(self)`, a computer-readable string representation of this object."""
         return f"CloseApproach(time={self.time_str!r}, distance={self.distance:.2f}, " \
                f"velocity={self.velocity:.2f}, neo={self.neo!r})"
+
+    def serialize(self):
+        """ Return a serialize dictionary for output printing"""
+        serialize_dict = {}
+        if self.time is None:
+            serialize_dict['datetime_utc'] = ''
+        else:
+            serialize_dict['datetime_utc'] = self.time_str
+        serialize_dict['distance_au'] = self.distance
+        serialize_dict['velocity_km_s'] = self.velocity
+
+        return serialize_dict
