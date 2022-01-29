@@ -24,9 +24,26 @@ def load_neos(neo_csv_path):
     :param neo_csv_path: A path to a CSV file containing data about near-Earth objects.
     :return: A collection of `NearEarthObject`s.
     """
-    # TODO: Load NEO data from the given CSV file.
-    return ()
+    with open(neo_csv_path, 'r') as infile:
+        neos_obj = csv.DictReader(infile)
+        neos_list = []
 
+        for neos in neos_obj:
+            if neos['name'] == '':
+                neos['name'] = None
+
+            if neos['diameter']:
+                neos['diameter'] = float(neos['diameter'])
+            else:
+                neos['diameter'] = float('nan')
+
+            if neos['pha'] == 'Y':
+                neos['pha'] = True
+            else:
+                neos['pha'] = False
+
+            neos_list.append(NearEarthObject(**neos))
+    return neos_list
 
 def load_approaches(cad_json_path):
     """Read close approach data from a JSON file.
@@ -34,5 +51,24 @@ def load_approaches(cad_json_path):
     :param cad_json_path: A path to a JSON file containing data about close approaches.
     :return: A collection of `CloseApproach`es.
     """
-    # TODO: Load close approach data from the given JSON file.
-    return ()
+    with open(cad_json_path, 'r') as infile:
+        cad_data = json.load(infile)['data']
+
+        cad_list = []
+        for cad_obj in cad_data:
+            cas = {}
+            cas['des'] = cad_obj[0]
+            cas["cd"] = cad_obj[3]
+
+            if cad_obj[4]:
+                cas["dict"] = float(cad_obj[4])
+            else:
+                cas["dict"] = float('nan')
+
+            if cad_obj[7]:
+                cas["v_rev"] = float(cad_obj[7])
+            else:
+                cas["v_rev"] = float('nan')
+
+            cad_list.append(CloseApproach(**cas))
+    return cad_list
