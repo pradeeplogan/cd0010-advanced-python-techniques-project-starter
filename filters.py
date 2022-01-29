@@ -17,7 +17,7 @@ iterator.
 You'll edit this file in Tasks 3a and 3c.
 """
 import operator
-
+import itertools
 
 class UnsupportedCriterionError(NotImplementedError):
     """A filter criterion is unsupported."""
@@ -108,9 +108,72 @@ def create_filters(
     :param hazardous: Whether the NEO of a matching `CloseApproach` is potentially hazardous.
     :return: A collection of filters for use with `query`.
     """
-    # TODO: Decide how you will represent your filters.
-    return ()
+    filter_list = []
+    if date:
+        filter_list.append(DateFilter(operator.eq, date))
 
+    if start_date:
+        filter_list.append(DateFilter(operator.ge, start_date))
+
+    if end_date:
+        filter_list.append(DateFilter(operator.le, end_date))
+
+    if distance_min:
+        filter_list.append(DistanceFilter(operator.ge, distance_min))
+
+    if distance_max:
+        filter_list.append(DistanceFilter(operator.le, distance_max))
+
+    if velocity_min:
+        filter_list.append(VelocityFilter(operator.ge, velocity_min))
+
+    if velocity_max:
+        filter_list.append(VelocityFilter(operator.le, velocity_max))
+
+    if diameter_min:
+        filter_list.append(DiameterFilter(operator.ge, diameter_min))
+
+    if diameter_max:
+        filter_list.append(DiameterFilter(operator.le, diameter_max))
+
+    if not hazardous is None:
+        filter_list.append(HazardousFilter(operator.eq, hazardous))
+
+    return filter_list
+
+class DateFilter(AttributeFilter):
+    """ To filter approachs according to date
+    """
+    @classmethod
+    def get(cls, approach):
+        return approach.time.date()
+
+class DistanceFilter(AttributeFilter):
+    """ To filter approachs according to distance
+    """    
+    @classmethod
+    def get(cls, approach):
+        return approach.distance
+class VelocityFilter(AttributeFilter):
+    """ To filter approachs according to velocity
+    """
+    @classmethod
+    def get(cls, approach):
+        return approach.velocity
+
+class DiameterFilter(AttributeFilter):
+    """ To filter approachs according to diameter
+    """
+    @classmethod
+    def get(cls, approach):
+        return approach.neo.diameter
+
+class HazardousFilter(AttributeFilter):
+    """ To filter approachs according to hazard
+    """    
+    @classmethod
+    def get(cls, approach):
+        return approach.neo.hazardous
 
 def limit(iterator, n=None):
     """Produce a limited stream of values from an iterator.
@@ -121,5 +184,6 @@ def limit(iterator, n=None):
     :param n: The maximum number of values to produce.
     :yield: The first (at most) `n` values from the iterator.
     """
-    # TODO: Produce at most `n` values from the given iterator.
-    return iterator
+    if n == 0:
+        n = None
+    return itertools.islice(iterator, 0, n)

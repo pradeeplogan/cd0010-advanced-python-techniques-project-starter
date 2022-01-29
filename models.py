@@ -108,7 +108,7 @@ class CloseApproach:
         if (info.get('cd', None) is None):
             self.time = None
         else:
-            self.time = cd_to_datetime(info.get('cd'))  # TODO: Use the cd_to_datetime function for this attribute.
+            self.time = cd_to_datetime(info.get('cd')) 
         self.distance = info.get('dict', float('nan'))
         self.velocity = info.get('v_rev', float('nan'))
         self.neo = info.get("neo", None)
